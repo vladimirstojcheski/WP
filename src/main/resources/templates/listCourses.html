@@ -1,0 +1,34 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>Welcome and Choose a Course</title>
+    <style type="text/css">
+        body {
+            width: 800px;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div>
+        <div>Logged in as: </div>
+        <div th:text="${session.username}"/> (<th:block th:text="${session.name + ' ' + session.lastName}"/>)</div>
+    <form method="POST" action="/servlet/logout">
+        <button type="submit">Logout</button>
+    </form>
+    <br>
+    <br>
+    <h1>Courses List</h1>
+</header>
+    <form th:method="POST" th:action="@{/listCourses}">
+        <h2>Choose course:</h2>
+        <input th:type="radio" th:value="${course.getCourseId()}" th:name="courseID" th:each="course: ${courses}" th:utext="${course.getName()} + '<br/>'">
+
+        <br/>
+        <button type="submit">Submit</button>
+    </form>
+<a href="/courses/add-form">Add new course</a>
+
+</body>
+</html>

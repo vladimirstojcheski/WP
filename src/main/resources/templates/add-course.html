@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>Create a New Student Page</title>
+</head>
+<body>
+<div>
+    <div>Logged in as: </div>
+    <div th:text="${session.username}"/> (<th:block th:text="${session.name + ' ' + session.lastName}"/>)</div>
+<form method="POST" action="/servlet/logout">
+    <button type="submit">Logout</button>
+</form>
+<br>
+<br>
+<header>
+    <h1>Create a new course </h1>
+
+    </div>
+</header>
+<section>
+    <form method="POST" action="">
+        <label for='username'>Username:</label>
+        <input id='username' type='text' name='username'/><br/>
+        <label for='description'>Description:</label>
+        <input id='description' type='text' name='description'/><br/>
+        <label>Select a teacher</label>
+        <select name="teachers">
+            <option th:each="teacher: ${teachers}" th:text="${teacher.getName()} + ' ' + ${teacher.getSurname()}"></option>
+        </select>
+
+        <input type='submit' value='Submit'/>
+    </form>
+</section>
+</body>
+</html>

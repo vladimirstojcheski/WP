@@ -2,26 +2,31 @@ package mk.ukim.finki.wp.lab.service.impl;
 
 import mk.ukim.finki.wp.lab.model.Course;
 import mk.ukim.finki.wp.lab.model.Student;
+import mk.ukim.finki.wp.lab.model.Teacher;
+import mk.ukim.finki.wp.lab.model.exceptions.CourseNameAlreadyExistsException;
+import mk.ukim.finki.wp.lab.model.exceptions.FillAllFieldsException;
 import mk.ukim.finki.wp.lab.repository.CourseRepository;
 import mk.ukim.finki.wp.lab.repository.StudentRepository;
+import mk.ukim.finki.wp.lab.repository.TeacherRepository;
 import mk.ukim.finki.wp.lab.service.CourseService;
-import mk.ukim.finki.wp.lab.service.StudentService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class CourseServiceImpl implements CourseService{
 
     private final CourseRepository courseRepository;
     private final StudentRepository studentRepository;
+    private final TeacherRepository teacherRepository;
 
-    public CourseServiceImpl(CourseRepository courseRepository, StudentRepository studentRepository)
+    public CourseServiceImpl(CourseRepository courseRepository, StudentRepository studentRepository,
+                             TeacherRepository teacherRepository)
     {
         this.courseRepository = courseRepository;
         this.studentRepository = studentRepository;
+        this.teacherRepository = teacherRepository;
     }
 
     @Override
@@ -54,6 +59,50 @@ public class CourseServiceImpl implements CourseService{
     @Override
     public Course findCourse(long courseId) {
         return courseRepository.findById(courseId);
+    }
+
+    @Override
+    public Course save(String name, String description, Long id) {
+        Teacher teacher = teacherRepository.findById(id).get();
+        Optional<Course> c = courseRepository.findAllCourses()
+                .stream().filter(s-> s.getName().equals(name)).findFirst();
+        if(c.isPresent())
+        {
+            throw new CourseNameAlreadyExistsException(name);
+        }
+        else if (name.equals("") || description.equals(""))
+        {
+            throw new FillAllFieldsException(name, description);
+        }
+        Course course = new Course(name, description, teacher);
+            courseRepository.addCourse(course);
+            return course;
+
+        }
+
+
+    @Override
+    public void deleteById(Long id) {
+        this.courseRepository.deleteById(id);
+    }
+
+    @Override
+    public Course edit(Long id, String name, String description, Long teacherId){
+        Optional<Course> c = courseRepository.findAllCourses()
+                .stream().filter(s-> s.getName().equals(name)).findFirst();
+        if(c.isPresent() == true && !c.get().getCourseId().equals(id))
+        {
+            throw new CourseNameAlreadyExistsException(name);
+        }
+        else if (name.equals("") || description.equals(""))
+        {
+            throw new FillAllFieldsException(name, description);
+        }
+        this.courseRepository.findById(id).setName(name);
+        this.courseRepository.findById(id).setDescription(description);
+        this.courseRepository.findById(id).setTeacher(this.teacherRepository.findById(teacherId).get());
+
+        return this.courseRepository.findById(id);
     }
 
 

@@ -28,6 +28,8 @@ public class ListStudentServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         WebContext context = new WebContext(req,resp,req.getServletContext());
         context.setVariable("students", studentService.listAll());
+        req.getSession().removeAttribute("hasError");
+        req.getSession().removeAttribute("error");
         this.springTemplateEngine.process("listStudents.html", context,resp.getWriter());
     }
 

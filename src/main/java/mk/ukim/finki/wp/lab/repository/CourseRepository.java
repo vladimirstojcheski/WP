@@ -2,11 +2,13 @@ package mk.ukim.finki.wp.lab.repository;
 
 import mk.ukim.finki.wp.lab.model.Course;
 import mk.ukim.finki.wp.lab.model.Student;
+import mk.ukim.finki.wp.lab.model.Teacher;
 import mk.ukim.finki.wp.lab.service.CourseService;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class CourseRepository{
@@ -22,11 +24,11 @@ public class CourseRepository{
         students.add(new Student("viktor.nikoloski", "password3", "Viktor", "Nikoloski"));
         students.add(new Student("ljupce.trajkoski", "password4", "Ljupce", "Trajkoski"));
         students.add(new Student("petko.petkoski", "password5", "Petko", "Petkoski"));
-        this.courses.add(new Course("Web programming", "web sesc", new ArrayList<Student>()));
-        this.courses.add(new Course("Operating systems", "OS desc", new ArrayList<Student>()));
-        this.courses.add(new Course("Artificial Intelligence", "AI desc", new ArrayList<Student>()));
-        this.courses.add(new Course("Software engineering", "SI desc", new ArrayList<Student>()));
-        this.courses.add(new Course("Advanced programming", "AP desc", new ArrayList<Student>()));
+        this.courses.add(new Course("Web programming", "web sesc", new Teacher(null, null)));
+        this.courses.add(new Course("Operating systems", "OS desc", new Teacher(null, null)));
+        this.courses.add(new Course("Artificial Intelligence", "AI desc", new Teacher(null, null)));
+        this.courses.add(new Course("Software engineering", "SI desc", new Teacher(null, null)));
+        this.courses.add(new Course("Advanced programming", "AP desc", new Teacher(null, null)));
     }
 
     public List<Course> findAllCourses()
@@ -72,5 +74,22 @@ public class CourseRepository{
 //            }
 //        }
         return course;
+    }
+
+    public void addCourse(Course course)
+    {
+        this.courses.add(course);
+    }
+
+    public Course findByName(String name)
+    {
+        return this.courses
+                .stream()
+                .filter(c->c.getName().equals(name)).findFirst().get();
+    }
+
+    public void deleteById(Long id)
+    {
+        this.courses.removeIf(i->i.getCourseId().equals(id));
     }
 }

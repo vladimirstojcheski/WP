@@ -40,6 +40,8 @@ public class CoursesListServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if(req.getParameter("courseID") == null)
         {
+            req.getSession().setAttribute("hasError", true);
+            req.getSession().setAttribute("error", "Please select a course");
             resp.sendRedirect("/listCourses");
             return;
         }

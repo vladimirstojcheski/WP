@@ -1,5 +1,6 @@
 package mk.ukim.finki.wp.lab.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Course {
@@ -10,12 +11,13 @@ public class Course {
     private List<Student> students;
     private Teacher teacher;
 
-    public Course(String name, String description, List<Student> students)
+    public Course(String name, String description, Teacher teacher)
     {
         this.courseId = (long) (Math.random()*1000);
         this.name = name;
         this.description = description;
-        this.students = students;
+        this.students = new ArrayList<>();
+        this.teacher = teacher;
     }
 
     public Long getCourseId() {
@@ -36,6 +38,14 @@ public class Course {
 
     public String getDescription() {
         return description;
+    }
+
+    public Teacher getTeacher() {
+        return teacher;
+    }
+
+    public void setTeacher(Teacher teacher) {
+        this.teacher = teacher;
     }
 
     public void setDescription(String description) {

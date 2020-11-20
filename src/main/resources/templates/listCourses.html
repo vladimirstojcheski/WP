@@ -2,6 +2,10 @@
 <head>
     <meta charset="utf-8">
     <title>Welcome and Choose a Course</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <style type="text/css">
         body {
             width: 800px;
@@ -9,6 +13,16 @@
         }
     </style>
 </head>
+
+<style>
+    #errorMessage
+    {
+        font-family: Arial;
+        font-size: 10px;
+        color: red;
+    }
+</style>
+
 <body>
 <header>
     <div>
@@ -21,14 +35,55 @@
     <br>
     <h1>Courses List</h1>
 </header>
-    <form th:method="POST" th:action="@{/listCourses}">
-        <h2>Choose course:</h2>
-        <input th:type="radio" th:value="${course.getCourseId()}" th:name="courseID" th:each="course: ${courses}" th:utext="${course.getName()} + '<br/>'">
+<h2>Choose course:</h2>
+<div>
+    <table>
+        <thead>
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Teacher</th>
+            <th scope="col">Description</th>
+            <th scope="col">Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="course: ${courses}">
+            <td style="border-style: dotted">
+                <input form="course-form" type="radio" th:value="${course.getCourseId()}"
+                       th:name="courseID" th:utext="${course.getName()} + '<br/>'">
+            </td>
+            <td th:text="${course.getTeacher().getName() != null} ? ${course.getTeacher().toString()}
+             : 'No teacher'" style="border-style: dotted">
 
-        <br/>
-        <button type="submit">Submit</button>
+            </td>
+            <td th:text="${course.getDescription()}" style="border-style: dotted">
+
+            </td>
+            <td class="text-right" style="border-style: dotted">
+                <form th:method="DELETE"
+                      th:action="@{'/courses/delete/{id}' (id=${course.getCourseId()})}">
+                    <input type="submit" value="Delete" style="font-size: 10px">
+                </form>
+            </td>
+            <td>
+                <form th:method="GET"
+                      th:action="@{'/courses/edit-form/{id}' (id=${course.getCourseId()})}">
+                    <input type="submit" value="Edit" style="font-size: 10px">
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <br/>
+    <div th:if="${session.hasError}" th:text="${session.error}" th:id="errorMessage">
+
+    </div>
+    <br>
+    <form id="course-form" th:method="POST" th:action="@{/listCourses}">
+        <input type="submit" form="course-form">
     </form>
-<a href="/courses/add-form">Add new course</a>
-
+    <!--</div>-->
+    <a href="/courses/add-form">Add new course</a>
+</div>
 </body>
 </html>

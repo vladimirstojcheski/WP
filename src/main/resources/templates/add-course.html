@@ -4,6 +4,14 @@
     <meta charset="utf-8">
     <title>Create a New Student Page</title>
 </head>
+<style>
+    #errorMessage
+    {
+        font-family: Arial;
+        font-size: 10px;
+        color: red;
+    }
+</style>
 <body>
 <div>
     <div>Logged in as: </div>
@@ -19,15 +27,33 @@
     </div>
 </header>
 <section>
-    <form method="POST" action="">
-        <label for='username'>Username:</label>
-        <input id='username' type='text' name='username'/><br/>
+    <form method="POST" action="/courses/add">
+        <label for='name'>Course name:</label>
+        <input id='name' type='text' name='name'
+               th:value="(${c} != null ? ${c.getName()} : '')"><br>
         <label for='description'>Description:</label>
-        <input id='description' type='text' name='description'/><br/>
+        <input id='description' type='text' name='description'
+               th:value="(${c} != null ? ${c.getDescription()} : '')"/><br/>
         <label>Select a teacher</label>
-        <select name="teachers">
-            <option th:each="teacher: ${teachers}" th:text="${teacher.getName()} + ' ' + ${teacher.getSurname()}"></option>
+        <select name="teacherId">
+            <option th:if="${c} != null"
+                    th:each="teacher: ${teachers}"
+                    th:selected="${teacher.getId() != null && c.getTeacher().getId() == teacher.getId()}"
+                    th:text="${teacher.toString()}"
+                    th:value="${teacher.getId()}">
+            </option>
+
+            <option th:if="${c} == null"
+                    th:each="teacher: ${teachers}"
+                    th:text="${teacher.toString()}"
+                    th:value="${teacher.getId()}">
+            </option>
         </select>
+        <br>
+        <div th:if="${hasError}" th:text="${error}" th:id="errorMessage">
+
+        </div>
+        <br>
 
         <input type='submit' value='Submit'/>
     </form>

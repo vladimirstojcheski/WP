@@ -33,4 +33,10 @@ public class TeacherRepository {
                 .stream()
                 .filter(i -> i.getId().equals(id)).findFirst();
     }
+
+    public String getNameSurname(Long id)
+    {
+        return String.format("%s %s", this.findById(id).get().getName(),
+                this.findById(id).get().getSurname());
+    }
 }

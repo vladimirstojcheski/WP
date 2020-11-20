@@ -47,10 +47,14 @@ public class LoginServlet extends HttpServlet {
             }
             req.getSession().setAttribute("name", name);
             req.getSession().setAttribute("lastName", lastName);
+            req.getSession().removeAttribute("hasError");
+            req.getSession().removeAttribute("error");
             resp.sendRedirect("/courses");
         }
         else
         {
+            req.getSession().setAttribute("hasError", true);
+            req.getSession().setAttribute("error", "Invalid user credentials");
             resp.sendRedirect("/login");
             return;
         }

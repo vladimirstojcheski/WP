@@ -6,84 +6,92 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <style type="text/css">
-        body {
-            width: 800px;
-            margin: auto;
-        }
-    </style>
 </head>
 
 <style>
-    #errorMessage
+    *
     {
-        font-family: Arial;
-        font-size: 10px;
-        color: red;
+        font-size: 18px;
     }
 </style>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+    <div class="navbar-brand" th:text="${session.username} + ' (' + ${session.name + ' ' + session.lastName} + ')'"></div>
+    <span style="float: right" class="navbar-text">
+        <form method="POST" action="/servlet/logout">
+        <button class="btn btn-light" style="float: right" type="submit">Logout</button>
+        </form>
+    </span>
+    </div>
+</nav>
 
 <body>
-<header>
-    <div>
-        <div>Logged in as: </div>
-        <div th:text="${session.username}"/> (<th:block th:text="${session.name + ' ' + session.lastName}"/>)</div>
-    <form method="POST" action="/servlet/logout">
-        <button type="submit">Logout</button>
+
+<div class="container">
+    <header>
+        <h1 style="text-align: center">Courses List</h1>
+    </header>
+    <h2>Choose course:</h2>
+    <form method="POST" th:action="@{'/courses/filter/'}">
+    <select class="form-control" name="type">
+        <option th:each="type: ${types}"
+                th:text="${type}"
+                th:value="${type.toString()}">
+        </option>
+    </select>
+        <input type="submit" value="Filter" class="btn btn-success">
     </form>
-    <br>
-    <br>
-    <h1>Courses List</h1>
-</header>
-<h2>Choose course:</h2>
-<div>
-    <table>
-        <thead>
+    <table class="table">
+        <thead class="thead-dark">
         <tr>
             <th scope="col">Name</th>
             <th scope="col">Teacher</th>
             <th scope="col">Description</th>
-            <th scope="col">Action</th>
+            <th scope="col">Delete</th>
+            <th scope="col">Edit</th>
+            <th scope="col">Type</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="course: ${courses}">
-            <td style="border-style: dotted">
+            <td>
                 <input form="course-form" type="radio" th:value="${course.getCourseId()}"
                        th:name="courseID" th:utext="${course.getName()} + '<br/>'">
             </td>
             <td th:text="${course.getTeacher().getName() != null} ? ${course.getTeacher().toString()}
-             : 'No teacher'" style="border-style: dotted">
+             : 'No teacher'">
 
             </td>
-            <td th:text="${course.getDescription()}" style="border-style: dotted">
+            <td th:text="${course.getDescription()}">
 
             </td>
-            <td class="text-right" style="border-style: dotted">
+            <td>
                 <form th:method="DELETE"
                       th:action="@{'/courses/delete/{id}' (id=${course.getCourseId()})}">
-                    <input type="submit" value="Delete" style="font-size: 10px">
+                    <input class="btn btn-danger" type="submit" value="Delete">
                 </form>
             </td>
             <td>
                 <form th:method="GET"
                       th:action="@{'/courses/edit-form/{id}' (id=${course.getCourseId()})}">
-                    <input type="submit" value="Edit" style="font-size: 10px">
+                    <input style="width: 70%" class="btn btn-dark" type="submit" value="Edit">
                 </form>
+            </td>
+            <td th:text="${course.getType()}">
+
             </td>
         </tr>
         </tbody>
     </table>
-    <br/>
-    <div th:if="${session.hasError}" th:text="${session.error}" th:id="errorMessage">
+    <div class="text-danger" th:if="${session.hasError}" th:text="${session.error}" th:id="errorMessage">
 
     </div>
-    <br>
+
     <form id="course-form" th:method="POST" th:action="@{/listCourses}">
-        <input type="submit" form="course-form">
+        <input class="btn btn-primary" type="submit" form="course-form">
     </form>
     <!--</div>-->
-    <a href="/courses/add-form">Add new course</a>
+    <a class="btn btn-success" href="/courses/add-form">Add new course</a>
 </div>
 </body>
 </html>

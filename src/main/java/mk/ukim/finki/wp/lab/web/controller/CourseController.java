@@ -2,6 +2,7 @@ package mk.ukim.finki.wp.lab.web.controller;
 
 import mk.ukim.finki.wp.lab.model.Course;
 import mk.ukim.finki.wp.lab.model.Teacher;
+import mk.ukim.finki.wp.lab.model.Type;
 import mk.ukim.finki.wp.lab.model.exceptions.CourseNameAlreadyExistsException;
 import mk.ukim.finki.wp.lab.model.exceptions.FillAllFieldsException;
 import mk.ukim.finki.wp.lab.service.CourseService;
@@ -14,7 +15,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.net.http.HttpRequest;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("courses")
@@ -31,14 +35,27 @@ public class CourseController {
     }
 
     @GetMapping
-    public String getCoursesPage(@RequestParam(required = false) String error, Model model)
+    public String getCoursesPage(@RequestParam(required = false) String error, Model model, HttpSession session)
     {
+        List<Course> courses = null;
         if(error != null && !error.isEmpty())
         {
             model.addAttribute("hasError", true);
             model.addAttribute("error", error);
         }
-        List<Course> courses = this.courseService.listAll();
+        if(session.getAttribute("type")!=null)
+        {
+            courses = this.courseService.listAll()
+                    .stream().filter(x->x.getType().equals(session.getAttribute("type")))
+                    .collect(Collectors.toList());
+        }
+        else {
+            courses = this.courseService.listAll()
+                    .stream().sorted((Comparator.comparing(Course::getName)))
+                    .collect(Collectors.toList());
+        }
+        List<Type> types = Arrays.asList(Type.values());
+        model.addAttribute("types", types);
         model.addAttribute("courses", courses);
         return "listCourses";
     }
@@ -52,6 +69,8 @@ public class CourseController {
             model.addAttribute("error", error);
         }
         List<Teacher> teachers = this.teacherService.findAll();
+        List<Type> types = Arrays.asList(Type.values());
+        model.addAttribute("types", types);
         model.addAttribute("teachers", teachers);
         return "add-course";
     }
@@ -61,14 +80,16 @@ public class CourseController {
             @RequestParam String name,
             @RequestParam String description,
             @RequestParam Long teacherId,
+            @RequestParam Type type,
             HttpSession session)
     {
         if(session.getAttribute("id") != null)
         {
             Long id = (long) session.getAttribute("id");
             try {
-                this.courseService.edit(id, name, description, teacherId);
+                this.courseService.edit(id, name, description, teacherId, type);
                 session.removeAttribute("id");
+                session.removeAttribute("type");
                 return "redirect:/courses";
             }
             catch (FillAllFieldsException | CourseNameAlreadyExistsException ex)
@@ -77,7 +98,7 @@ public class CourseController {
             }
         }
         try {
-            this.courseService.save(name, description, teacherId);
+            this.courseService.save(name, description, teacherId, type);
         }
         catch (FillAllFieldsException | CourseNameAlreadyExistsException ex)
         {
@@ -101,11 +122,20 @@ public class CourseController {
             session.setAttribute("id", id);
             Course course = this.courseService.findCourse(id);
             List<Teacher> teachers = this.teacherService.findAll();
+            List<Type> types = Arrays.asList(Type.values());
+            model.addAttribute("types", types);
             model.addAttribute("c", course);
             model.addAttribute("teachers", teachers);
             return "add-course";
         }
         return "redirect:/courses?error=CourseNotFound";
+    }
+
+    @PostMapping("/filter")
+    public String getFilteredCoursePage(@RequestParam Type type, HttpSession session)
+    {
+        session.setAttribute("type", type);
+        return "redirect:/courses";
     }
 
     @DeleteMapping("/delete/{id}")
@@ -114,8 +144,4 @@ public class CourseController {
         this.courseService.deleteById(id);
         return "redirect:/courses";
     }
-
-
-
-    
 }

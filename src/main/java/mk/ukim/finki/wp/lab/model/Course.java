@@ -10,14 +10,24 @@ public class Course {
     private String description;
     private List<Student> students;
     private Teacher teacher;
+    private Type type;
 
-    public Course(String name, String description, Teacher teacher)
+    public Course(String name, String description, Teacher teacher, Type type)
     {
         this.courseId = (long) (Math.random()*1000);
         this.name = name;
         this.description = description;
         this.students = new ArrayList<>();
         this.teacher = teacher;
+        this.type = type;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
     }
 
     public Long getCourseId() {

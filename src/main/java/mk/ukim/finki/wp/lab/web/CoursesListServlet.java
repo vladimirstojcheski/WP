@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -32,7 +33,9 @@ public class CoursesListServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         WebContext context = new WebContext(req,resp,req.getServletContext());
-        context.setVariable("courses", courseService.listAll());
+        context.setVariable("courses", this.courseService.listAll()
+                .stream().sorted((Comparator.comparing(Course::getName)))
+                .collect(Collectors.toList()));
         this.springTemplateEngine.process("listCourses.html", context,resp.getWriter());
     }
 

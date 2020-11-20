@@ -3,6 +3,7 @@ package mk.ukim.finki.wp.lab.service.impl;
 import mk.ukim.finki.wp.lab.model.Course;
 import mk.ukim.finki.wp.lab.model.Student;
 import mk.ukim.finki.wp.lab.model.Teacher;
+import mk.ukim.finki.wp.lab.model.Type;
 import mk.ukim.finki.wp.lab.model.exceptions.CourseNameAlreadyExistsException;
 import mk.ukim.finki.wp.lab.model.exceptions.FillAllFieldsException;
 import mk.ukim.finki.wp.lab.repository.CourseRepository;
@@ -62,7 +63,7 @@ public class CourseServiceImpl implements CourseService{
     }
 
     @Override
-    public Course save(String name, String description, Long id) {
+    public Course save(String name, String description, Long id, Type type) {
         Teacher teacher = teacherRepository.findById(id).get();
         Optional<Course> c = courseRepository.findAllCourses()
                 .stream().filter(s-> s.getName().equals(name)).findFirst();
@@ -74,12 +75,11 @@ public class CourseServiceImpl implements CourseService{
         {
             throw new FillAllFieldsException(name, description);
         }
-        Course course = new Course(name, description, teacher);
+        Course course = new Course(name, description, teacher, type);
             courseRepository.addCourse(course);
             return course;
 
         }
-
 
     @Override
     public void deleteById(Long id) {
@@ -87,7 +87,7 @@ public class CourseServiceImpl implements CourseService{
     }
 
     @Override
-    public Course edit(Long id, String name, String description, Long teacherId){
+    public Course edit(Long id, String name, String description, Long teacherId, Type type){
         Optional<Course> c = courseRepository.findAllCourses()
                 .stream().filter(s-> s.getName().equals(name)).findFirst();
         if(c.isPresent() == true && !c.get().getCourseId().equals(id))
@@ -101,6 +101,7 @@ public class CourseServiceImpl implements CourseService{
         this.courseRepository.findById(id).setName(name);
         this.courseRepository.findById(id).setDescription(description);
         this.courseRepository.findById(id).setTeacher(this.teacherRepository.findById(teacherId).get());
+        this.courseRepository.findById(id).setType(type);
 
         return this.courseRepository.findById(id);
     }

@@ -1,18 +1,20 @@
 package mk.ukim.finki.wp.lab.service.impl;
 
 import mk.ukim.finki.wp.lab.model.Student;
-import mk.ukim.finki.wp.lab.repository.StudentRepository;
+import mk.ukim.finki.wp.lab.repository.impl.StudentRepository;
+import mk.ukim.finki.wp.lab.repository.jpa.JpaStudentRepository;
 import mk.ukim.finki.wp.lab.service.StudentService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class StudentServiceImpl implements StudentService {
 
-    private final StudentRepository studentRepository;
+    private final JpaStudentRepository studentRepository;
 
-    public StudentServiceImpl(StudentRepository studentRepository)
+    public StudentServiceImpl(JpaStudentRepository studentRepository)
     {
         this.studentRepository = studentRepository;
     }
@@ -20,24 +22,29 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public List<Student> listAll() {
-        return studentRepository.findAllStudents();
+        return studentRepository.findAll();
     }
 
     @Override
-    public List<Student> searchByNameOrSurname(String text) {
-        return studentRepository.findAllByNameOrSurname(text);
+    public List<Student> searchByName(String text) {
+        return studentRepository.findAllByName(text);
     }
 
     @Override
     public Student save(String username, String password, String name, String surname) {
         Student s = new Student(username,password,name,surname);
-        studentRepository.addStudent(s);
+        this.studentRepository.save(s);
         return s;
     }
 
     @Override
-    public Student checkCridentals(String username, String password) {
-        return studentRepository.checkUserAndPass(username, password);
+    public Optional<Student> checkCridentals(String username, String password) {
+        return studentRepository.findByUsernameAndPassword(username, password);
+    }
+
+    @Override
+    public Student findByUsername(String username) {
+        return studentRepository.findById(username).get();
     }
 
 

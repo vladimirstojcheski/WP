@@ -34,19 +34,25 @@
     <h2>Choose course:</h2>
     <form method="POST" th:action="@{'/courses/filter/'}">
     <select class="form-control" name="type">
-        <option th:each="type: ${types}"
+        <option th:selected="${session.type != null} ? ${session.type == type} : ${type == 'WINTER'}"
+                th:each="type: ${types}"
                 th:text="${type}"
                 th:value="${type.toString()}">
         </option>
     </select>
         <input type="submit" value="Filter" class="btn btn-success">
     </form>
+    <form method="POST" action="/courses/reset">
+        <input type="submit" class="btn btn-dark" value="Reset filter">
+    </form>
+</div>
+<div class="container">
     <table class="table">
         <thead class="thead-dark">
         <tr>
             <th scope="col">Name</th>
             <th scope="col">Teacher</th>
-            <th scope="col">Description</th>
+            <th scope="col" style="width: 100px">Description</th>
             <th scope="col">Delete</th>
             <th scope="col">Edit</th>
             <th scope="col">Type</th>
@@ -62,7 +68,7 @@
              : 'No teacher'">
 
             </td>
-            <td th:text="${course.getDescription()}">
+            <td style="width: 200px" th:text="${course.getDescription()}">
 
             </td>
             <td>

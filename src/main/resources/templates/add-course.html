@@ -34,19 +34,19 @@
         <div class="form-group">
             <label for='name'>Course name:</label>
             <input class="form-control" id='name' type='text' name='name'
-                th:value="(${c} != null ? ${c.getName()} : '')">
+                th:value="(${c} != null ? ${c.get().getName()} : '')">
         </div>
         <div class="form-group">
         <label for='description'>Description:</label>
         <textarea class="form-control" id='description' type='text' name='description'
-                  th:text="(${c} != null ? ${c.getDescription()} : '')" rows="3"></textarea>
+                  th:text="(${c} != null ? ${c.get().getDescription()} : '')" rows="3"></textarea>
         </div>
         <div class="form-group">
         <label>Select a teacher</label>
         <select class="form-control" name="teacherId">
             <option th:if="${c} != null"
                     th:each="teacher: ${teachers}"
-                    th:selected="${teacher.getId() != null && c.getTeacher().getId() == teacher.getId()}"
+                    th:selected="${teacher.getId() != null && c.get().getTeacher().getId() == teacher.getId()}"
                     th:text="${teacher.toString()}"
                     th:value="${teacher.getId()}">
             </option>
@@ -63,7 +63,7 @@
             <select class="form-control" name="type">
                 <option th:if="${c} != null"
                         th:each="type: ${types}"
-                        th:selected="${type.toString() != null && c.getType().toString() == type.toString()}"
+                        th:selected="${type.toString() != null && c.get().getType().toString() == type.toString()}"
                         th:text="${type}"
                         th:value="${type}">
                 </option>

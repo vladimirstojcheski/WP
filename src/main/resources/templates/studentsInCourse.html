@@ -29,13 +29,13 @@
 
 </header>
 <section>
-    <h2 th:text="${course.getName()}"></h2>
+    <h2 th:text="${course.get().getName()}"></h2>
     <br>
     <ul class="list-group">
-        <li class="list-group-item" th:each="student: ${students}"><th:block th:text="${student.getName()}"/> <th:block th:text="${student.getSurname()}"/></li>
+        <li class="list-group-item" th:each="grade: ${grades}"><th:block th:text="${grade.getStudent().getName()}"/> <th:block th:text="${grade.getStudent().getSurname()}"/> <th:block th:text="${grade.getGrade()}"/></li>
     </ul>
     <br>
-    <a class="btn btn-primary" href="/listCourses">Back</a>
+    <a class="btn btn-primary" href="/courses">Back</a>
 </section>
 </div>
 </body>

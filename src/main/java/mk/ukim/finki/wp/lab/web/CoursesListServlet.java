@@ -1,7 +1,6 @@
 package mk.ukim.finki.wp.lab.web;
 
 import mk.ukim.finki.wp.lab.model.Course;
-import mk.ukim.finki.wp.lab.repository.CourseRepository;
 import mk.ukim.finki.wp.lab.service.CourseService;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.spring5.SpringTemplateEngine;
@@ -12,10 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @WebServlet (name = "courses-servlet", urlPatterns = "/listCourses")
@@ -45,11 +41,12 @@ public class CoursesListServlet extends HttpServlet {
         {
             req.getSession().setAttribute("hasError", true);
             req.getSession().setAttribute("error", "Please select a course");
-            resp.sendRedirect("/listCourses");
+            resp.sendRedirect("/courses");
             return;
         }
         String courseID = req.getParameter("courseID");
         req.getSession().setAttribute("courseID", courseID);
+        req.getSession().removeAttribute("type");
 
         resp.sendRedirect("/AddStudent");
     }

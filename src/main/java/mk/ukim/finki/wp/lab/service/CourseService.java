@@ -9,10 +9,10 @@ import java.util.Optional;
 
 public interface CourseService {
     List<Student> listStudentsByCourse(Long courseId);
-    Course addStudentInCourse(String username, Long courseId);
+    Optional<Course> addStudentInCourse(String username, Long courseId);
     List<Course> listAll();
-    Course findCourse(long courseId);
+    Optional<Course> findCourse(long courseId);
     Course save(String name, String description, Long id, Type type);
     void deleteById(Long id);
-    Course edit(Long id, String name, String description, Long teacherId, Type type);
+    Optional<Course> edit(Long id, String name, String description, Long teacherId, Type type);
 }

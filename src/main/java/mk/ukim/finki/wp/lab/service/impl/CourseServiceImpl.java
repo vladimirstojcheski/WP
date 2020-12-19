@@ -6,24 +6,28 @@ import mk.ukim.finki.wp.lab.model.Teacher;
 import mk.ukim.finki.wp.lab.model.Type;
 import mk.ukim.finki.wp.lab.model.exceptions.CourseNameAlreadyExistsException;
 import mk.ukim.finki.wp.lab.model.exceptions.FillAllFieldsException;
-import mk.ukim.finki.wp.lab.repository.CourseRepository;
-import mk.ukim.finki.wp.lab.repository.StudentRepository;
-import mk.ukim.finki.wp.lab.repository.TeacherRepository;
+import mk.ukim.finki.wp.lab.repository.impl.CourseRepository;
+import mk.ukim.finki.wp.lab.repository.impl.StudentRepository;
+import mk.ukim.finki.wp.lab.repository.impl.TeacherRepository;
+import mk.ukim.finki.wp.lab.repository.jpa.JpaCourseRepository;
+import mk.ukim.finki.wp.lab.repository.jpa.JpaStudentRepository;
+import mk.ukim.finki.wp.lab.repository.jpa.JpaTeacherRepository;
 import mk.ukim.finki.wp.lab.service.CourseService;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class CourseServiceImpl implements CourseService{
 
-    private final CourseRepository courseRepository;
-    private final StudentRepository studentRepository;
-    private final TeacherRepository teacherRepository;
+    private final JpaCourseRepository courseRepository;
+    private final JpaStudentRepository studentRepository;
+    private final JpaTeacherRepository teacherRepository;
 
-    public CourseServiceImpl(CourseRepository courseRepository, StudentRepository studentRepository,
-                             TeacherRepository teacherRepository)
+    public CourseServiceImpl(JpaCourseRepository courseRepository, JpaStudentRepository studentRepository,
+                             JpaTeacherRepository teacherRepository)
     {
         this.courseRepository = courseRepository;
         this.studentRepository = studentRepository;
@@ -32,40 +36,46 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public List<Student> listStudentsByCourse(Long courseId) {
-        return courseRepository.findAllStudentsByCourse(courseId);
+        Optional<Course> c = courseRepository.findById(courseId);
+        return c.get().getStudents();
     }
 
     @Override
-    public Course addStudentInCourse(String username, Long courseId) {
-        for(Student s : studentRepository.findAllStudents())
-        {
-            if (s.getUsername().equals(username))
-            {
-                return courseRepository.addStudentToCourse(s, courseRepository.findById(courseId));
-            }
-        }
-//        List<Student> sl = studentRepository.findAllStudents().stream()
-//                .filter(r-> r.getUsername().equals(username)).collect(Collectors.toList());
-//        Student s = sl.get(0);
-        Course c = courseRepository.findById(courseId);
-//        courseRepository.addStudentToCourse(s, c);
-        return c;
+    @Transactional
+    public Optional<Course> addStudentInCourse(String username, Long courseId) {
+        Student student = this.studentRepository.findById(username).orElseThrow(
+                () -> new CourseNameAlreadyExistsException(username));
+        Optional<Course> course = this.courseRepository.findById(courseId);
+
+        this.courseRepository.findById(courseId).get().getStudents().add(student);
+        return course;
+
+//        for(Student s : studentRepository.findAllStudents())
+//        {
+//            if (s.getUsername().equals(username))
+//            {
+//                return courseRepository.addStudentToCourse(s, courseRepository.findById(courseId));
+//            }
+//        }
+//        Course c = courseRepository.findByCourseId(courseId);
+//
+//        return c;
     }
 
     @Override
     public List<Course> listAll() {
-        return courseRepository.findAllCourses();
+        return courseRepository.findAll();
     }
 
     @Override
-    public Course findCourse(long courseId) {
-        return courseRepository.findById(courseId);
+    public Optional<Course> findCourse(long courseId) {
+        return courseRepository.findByCourseId(courseId);
     }
 
     @Override
     public Course save(String name, String description, Long id, Type type) {
         Teacher teacher = teacherRepository.findById(id).get();
-        Optional<Course> c = courseRepository.findAllCourses()
+        Optional<Course> c = courseRepository.findAll()
                 .stream().filter(s-> s.getName().equals(name)).findFirst();
         if(c.isPresent())
         {
@@ -76,7 +86,7 @@ public class CourseServiceImpl implements CourseService{
             throw new FillAllFieldsException(name, description);
         }
         Course course = new Course(name, description, teacher, type);
-            courseRepository.addCourse(course);
+            courseRepository.save(course);
             return course;
 
         }
@@ -87,10 +97,11 @@ public class CourseServiceImpl implements CourseService{
     }
 
     @Override
-    public Course edit(Long id, String name, String description, Long teacherId, Type type){
-        Optional<Course> c = courseRepository.findAllCourses()
+    @Transactional
+    public Optional<Course> edit(Long id, String name, String description, Long teacherId, Type type){
+        Optional<Course> c = courseRepository.findAll()
                 .stream().filter(s-> s.getName().equals(name)).findFirst();
-        if(c.isPresent() == true && !c.get().getCourseId().equals(id))
+        if(c.isPresent() && !c.get().getCourseId().equals(id))
         {
             throw new CourseNameAlreadyExistsException(name);
         }
@@ -98,10 +109,10 @@ public class CourseServiceImpl implements CourseService{
         {
             throw new FillAllFieldsException(name, description);
         }
-        this.courseRepository.findById(id).setName(name);
-        this.courseRepository.findById(id).setDescription(description);
-        this.courseRepository.findById(id).setTeacher(this.teacherRepository.findById(teacherId).get());
-        this.courseRepository.findById(id).setType(type);
+        this.courseRepository.findById(id).get().setName(name);
+        this.courseRepository.findById(id).get().setDescription(description);
+        this.courseRepository.findById(id).get().setTeacher(this.teacherRepository.findById(teacherId).get());
+        this.courseRepository.findById(id).get().setType(type);
 
         return this.courseRepository.findById(id);
     }

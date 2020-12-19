@@ -18,6 +18,7 @@ import java.net.http.HttpRequest;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -47,6 +48,7 @@ public class CourseController {
         {
             courses = this.courseService.listAll()
                     .stream().filter(x->x.getType().equals(session.getAttribute("type")))
+                    .sorted(Comparator.comparing(Course::getName))
                     .collect(Collectors.toList());
         }
         else {
@@ -54,11 +56,12 @@ public class CourseController {
                     .stream().sorted((Comparator.comparing(Course::getName)))
                     .collect(Collectors.toList());
         }
+
         List<Type> types = Arrays.asList(Type.values());
         model.addAttribute("types", types);
         model.addAttribute("courses", courses);
         return "listCourses";
-    }
+}
 
     @GetMapping("/add-form")
     public String getAddCoursePage(@RequestParam(required = false) String error, Model model)
@@ -99,6 +102,7 @@ public class CourseController {
         }
         try {
             this.courseService.save(name, description, teacherId, type);
+            session.removeAttribute("type");
         }
         catch (FillAllFieldsException | CourseNameAlreadyExistsException ex)
         {
@@ -118,9 +122,9 @@ public class CourseController {
             model.addAttribute("hasError", true);
             model.addAttribute("error", error);
         }
-        if(this.courseService.findCourse(id) != null) {
+        if(!this.courseService.findCourse(id).isEmpty()) {
             session.setAttribute("id", id);
-            Course course = this.courseService.findCourse(id);
+            Optional<Course> course = this.courseService.findCourse(id);
             List<Teacher> teachers = this.teacherService.findAll();
             List<Type> types = Arrays.asList(Type.values());
             model.addAttribute("types", types);
@@ -137,6 +141,14 @@ public class CourseController {
         session.setAttribute("type", type);
         return "redirect:/courses";
     }
+
+    @PostMapping("/reset")
+    public String getResetedCoursePage(HttpSession session)
+    {
+            session.removeAttribute("type");
+            return "redirect:/courses";
+    }
+
 
     @DeleteMapping("/delete/{id}")
     public String deleteCourse(@PathVariable Long id)

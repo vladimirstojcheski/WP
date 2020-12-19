@@ -34,7 +34,7 @@ public class LoginServlet extends HttpServlet {
         String username = req.getParameter("username");
         String password = req.getParameter("password");
 
-        if (studentService.checkCridentals(username, password) != null)
+        if (!studentService.checkCridentals(username, password).isEmpty())
         {
             req.getSession().setAttribute("username", username);
             String name="";

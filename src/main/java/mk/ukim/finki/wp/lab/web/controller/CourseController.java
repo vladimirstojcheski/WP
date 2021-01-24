@@ -7,6 +7,7 @@ import mk.ukim.finki.wp.lab.model.exceptions.CourseNameAlreadyExistsException;
 import mk.ukim.finki.wp.lab.model.exceptions.FillAllFieldsException;
 import mk.ukim.finki.wp.lab.service.CourseService;
 import mk.ukim.finki.wp.lab.service.TeacherService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -60,10 +61,12 @@ public class CourseController {
         List<Type> types = Arrays.asList(Type.values());
         model.addAttribute("types", types);
         model.addAttribute("courses", courses);
-        return "listCourses";
+        model.addAttribute("bodyContent", "listCourses");
+        return "master-template";
 }
 
     @GetMapping("/add-form")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String getAddCoursePage(@RequestParam(required = false) String error, Model model)
     {
         if(error != null && !error.isEmpty())
@@ -75,7 +78,8 @@ public class CourseController {
         List<Type> types = Arrays.asList(Type.values());
         model.addAttribute("types", types);
         model.addAttribute("teachers", teachers);
-        return "add-course";
+        model.addAttribute("bodyContent", "add-course");
+        return "master-template";
     }
 
     @PostMapping("/add")
@@ -113,6 +117,7 @@ public class CourseController {
     }
 
     @GetMapping("/edit-form/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String getEditCoursePage(@PathVariable Long id,
                                     @RequestParam(required = false) String error,
                                     Model model, HttpSession session)
@@ -130,7 +135,8 @@ public class CourseController {
             model.addAttribute("types", types);
             model.addAttribute("c", course);
             model.addAttribute("teachers", teachers);
-            return "add-course";
+            model.addAttribute("bodyContent", "add-course");
+            return "master-template";
         }
         return "redirect:/courses?error=CourseNotFound";
     }
@@ -147,6 +153,22 @@ public class CourseController {
     {
             session.removeAttribute("type");
             return "redirect:/courses";
+    }
+
+    @PostMapping("/select-course")
+    public String getStudentsPage(@RequestParam String courseID, HttpSession session)
+    {
+        session.setAttribute("courseID", courseID);
+        session.removeAttribute("type");
+        return "redirect:/students";
+    }
+
+    @PostMapping("select-course-user")
+    public String getStudentEnrollmentPage(@RequestParam String courseID, HttpSession session)
+    {
+        session.setAttribute("courseID", courseID);
+        session.removeAttribute("type");
+        return "redirect:/students/enrollment";
     }
 
 

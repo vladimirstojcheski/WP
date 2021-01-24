@@ -28,4 +28,11 @@ public class TeacherServiceImpl implements TeacherService {
     public Optional<Teacher> findById(Long id) {
         return this.teacherRepository.findById(id);
     }
+
+    @Override
+    public Teacher create(String name, String surname) {
+        Teacher t = new Teacher(name, surname);
+        teacherRepository.save(t);
+        return t;
+    }
 }

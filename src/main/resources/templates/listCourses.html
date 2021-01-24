@@ -1,32 +1,4 @@
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="utf-8">
-    <title>Welcome and Choose a Course</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-</head>
-
-<style>
-    *
-    {
-        font-size: 18px;
-    }
-</style>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-    <div class="navbar-brand" th:text="${session.username} + ' (' + ${session.name + ' ' + session.lastName} + ')'"></div>
-    <span style="float: right" class="navbar-text">
-        <form method="POST" action="/servlet/logout">
-        <button class="btn btn-light" style="float: right" type="submit">Logout</button>
-        </form>
-    </span>
-    </div>
-</nav>
-
-<body>
-
+<div xmlns:th="http://www.thymeleaf.org">
 <div class="container">
     <header>
         <h1 style="text-align: center">Courses List</h1>
@@ -53,8 +25,10 @@
             <th scope="col">Name</th>
             <th scope="col">Teacher</th>
             <th scope="col" style="width: 100px">Description</th>
+            <th:block sec:authorize="hasRole('ROLE_ADMIN')">
             <th scope="col">Delete</th>
             <th scope="col">Edit</th>
+            </th:block>
             <th scope="col">Type</th>
         </tr>
         </thead>
@@ -71,18 +45,20 @@
             <td style="width: 200px" th:text="${course.getDescription()}">
 
             </td>
+            <th:block sec:authorize="hasRole('ROLE_ADMIN')">
             <td>
                 <form th:method="DELETE"
                       th:action="@{'/courses/delete/{id}' (id=${course.getCourseId()})}">
-                    <input class="btn btn-danger" type="submit" value="Delete">
+                    <input class="btn btn-danger delete-course" type="submit" value="Delete">
                 </form>
             </td>
             <td>
                 <form th:method="GET"
                       th:action="@{'/courses/edit-form/{id}' (id=${course.getCourseId()})}">
-                    <input style="width: 70%" class="btn btn-dark" type="submit" value="Edit">
+                    <input style="width: 70%" class="btn btn-dark edit-course" type="submit" value="Edit">
                 </form>
             </td>
+            </th:block>
             <td th:text="${course.getType()}">
 
             </td>
@@ -93,11 +69,19 @@
 
     </div>
 
-    <form id="course-form" th:method="POST" th:action="@{/listCourses}">
-        <input class="btn btn-primary" type="submit" form="course-form">
-    </form>
+    <th:block sec:authorize="hasRole('ROLE_ADMIN')">
+        <form id="course-form" th:method="POST" th:action="@{'/courses/select-course'}">
+            <input class="btn btn-primary" type="submit" form="course-form">
+        </form>
+    </th:block>
+    <th:block sec:authorize="isAuthenticated()==false || hasRole('ROLE_USER')">
+        <form id="course-form" th:method="POST" th:action="@{'/courses/select-course-user'}">
+            <input class="btn btn-primary" type="submit" form="course-form">
+        </form>
+    </th:block>
     <!--</div>-->
-    <a class="btn btn-success" href="/courses/add-form">Add new course</a>
+    <th:block sec:authorize="hasRole('ROLE_ADMIN')">
+        <a class="btn btn-success add-course-btn" href="/courses/add-form">Add new course</a>
+    </th:block>
 </div>
-</body>
-</html>
+</div>

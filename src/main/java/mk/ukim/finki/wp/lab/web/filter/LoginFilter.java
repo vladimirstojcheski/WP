@@ -1,6 +1,7 @@
 package mk.ukim.finki.wp.lab.web.filter;
 
 import mk.ukim.finki.wp.lab.model.Student;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 
 import javax.servlet.*;
@@ -10,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @WebFilter
+@Profile("servlet")
 public class LoginFilter implements Filter {
 
     @Override

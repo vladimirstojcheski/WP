@@ -12,16 +12,6 @@
         font-size: 18px;
     }
 </style>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-        <div class="navbar-brand" th:text="${session.username} + ' (' + ${session.name + ' ' + session.lastName} + ')'"></div>
-        <span style="float: right" class="navbar-text">
-        <form method="POST" action="/servlet/logout">
-        <button class="btn btn-light" style="float: right" type="submit">Logout</button>
-        </form>
-    </span>
-    </div>
-</nav>
 <body>
 <div class="container" style="width: 25%">
 <header>
@@ -30,7 +20,7 @@
 
 </header>
 <section>
-    <form class="form" method="POST" th:action="@{/createStudent}">
+    <form class="form" method="POST" th:action="@{'/students/create'}">
         <div class="form-group">
         <label for='username'>Username:</label><input class="form-control"  id='username' type='text' name='username'>
         </div>

@@ -1,36 +1,38 @@
-package mk.ukim.finki.wp.lab.web;
+package mk.ukim.finki.wp.lab.web.controller;
 
 import mk.ukim.finki.wp.lab.model.Student;
 import mk.ukim.finki.wp.lab.service.StudentService;
-import org.thymeleaf.context.WebContext;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
-@WebServlet (name = "login-servlet", urlPatterns = "/servlet/login")
-public class LoginServlet extends HttpServlet {
+@Controller
+@RequestMapping("/login")
+public class LoginController {
 
     private final StudentService studentService;
-    private final SpringTemplateEngine springTemplateEngine;
 
-    public LoginServlet(StudentService studentService, SpringTemplateEngine springTemplateEngine) {
+
+    public LoginController(StudentService studentService, SpringTemplateEngine springTemplateEngine) {
         this.studentService = studentService;
-        this.springTemplateEngine = springTemplateEngine;
     }
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        WebContext context = new WebContext(req, resp, req.getServletContext());
-        springTemplateEngine.process("login.html", context, resp.getWriter());
+    @GetMapping
+    public String getLoginPage(Model model)
+    {
+        model.addAttribute("bodyContent","login");
+        return "master-template";
+
     }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    @PostMapping
+    public String login(HttpServletRequest req, Model model)
+    {
         String username = req.getParameter("username");
         String password = req.getParameter("password");
 
@@ -49,15 +51,13 @@ public class LoginServlet extends HttpServlet {
             req.getSession().setAttribute("lastName", lastName);
             req.getSession().removeAttribute("hasError");
             req.getSession().removeAttribute("error");
-            resp.sendRedirect("/courses");
+            return "redirect:/courses";
         }
         else
         {
             req.getSession().setAttribute("hasError", true);
             req.getSession().setAttribute("error", "Invalid user credentials");
-            resp.sendRedirect("/login");
-            return;
+            return "redirect:/login";
         }
-
     }
 }

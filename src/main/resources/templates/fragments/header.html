@@ -1,0 +1,17 @@
+<header xmlns:th="http://www.thymeleaf.org">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+<!--        <div class="navbar-brand" th:text="${session.username} + ' (' + ${session.name + ' ' + session.lastName} + ')'"></div>-->
+        <div class="navbar-brand">
+            <th:block th:if="${#request.getRemoteUser()}!=null"
+                      th:text="${#request.getRemoteUser()}"></th:block>
+        </div>
+        <a class="nav-item nav-link" th:href="${'/courses'}">Courses</a>
+        <span style="float: right" class="navbar-text">
+        <form method="POST" action="/servlet/logout">
+        <button class="btn btn-light" style="float: right" type="submit">Logout</button>
+        </form>
+    </span>
+    </div>
+</nav>
+</header>

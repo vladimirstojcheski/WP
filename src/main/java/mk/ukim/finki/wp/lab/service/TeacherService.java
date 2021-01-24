@@ -8,5 +8,6 @@ import java.util.Optional;
 public interface TeacherService {
     List<Teacher> findAll();
     Optional<Teacher> findById(Long id);
+    Teacher create(String name, String surname);
 
 }

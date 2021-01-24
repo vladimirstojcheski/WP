@@ -86,10 +86,9 @@ public class CourseServiceImpl implements CourseService{
             throw new FillAllFieldsException(name, description);
         }
         Course course = new Course(name, description, teacher, type);
-            courseRepository.save(course);
-            return course;
-
-        }
+        courseRepository.save(course);
+        return course;
+    }
 
     @Override
     public void deleteById(Long id) {

@@ -56,7 +56,7 @@ public class StudentEnrollmentSummary extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        String username = req.getParameter("size");
+        String username = req.getParameter("username");
         String courseID = (String) req.getSession().getAttribute("courseID");
         Long cID = Long.parseLong(courseID);
 

@@ -1,6 +1,8 @@
 package mk.ukim.finki.wp.lab.service.impl;
 
 import mk.ukim.finki.wp.lab.model.Student;
+import mk.ukim.finki.wp.lab.model.exceptions.InvalidUsernameOrPasswordException;
+import mk.ukim.finki.wp.lab.model.exceptions.UsernameAlreadyExistsException;
 import mk.ukim.finki.wp.lab.repository.impl.StudentRepository;
 import mk.ukim.finki.wp.lab.repository.jpa.JpaStudentRepository;
 import mk.ukim.finki.wp.lab.service.StudentService;
@@ -32,6 +34,10 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Student save(String username, String password, String name, String surname) {
+        if (username==null || username.isEmpty()  || password==null || password.isEmpty())
+            throw new InvalidUsernameOrPasswordException();
+        if (this.studentRepository.findById(username).isPresent())
+            throw new UsernameAlreadyExistsException(username);
         Student s = new Student(username,password,name,surname);
         this.studentRepository.save(s);
         return s;
